@@ -1,0 +1,121 @@
+/*
+Name: Gunmetal Indigo
+Author: f09f9095
+Link: https://github.com/f09f9095/renamr
+*/
+
+QDialog {
+	background-color:#0B0D11;
+	border: 1px solid #002226;
+	/* border-radius: 4px; */
+}
+QPushButton{
+	color: #a9b7c6;
+	background-color: #061519;
+	/* border-radius: 3px; */
+	border: 1px solid #00171a;
+	/* border-width: 1px;
+	border-style: solid;
+	border-bottom-color: #00171a;
+	border-top-color: #00171a;
+	border-left-color: #00171a;
+	border-right-color: #00171a; */
+	/* margin-left: 10px;
+	margin-right: 10px; */
+	padding-left: 2ex;
+	padding-right: 2ex;
+}
+QPushButton:hover{
+	color: #FFFFFF;
+	background-color: #0C2C30;
+}
+QProgressBar {
+	border: 1px solid #4c4e52;
+	border-radius: 3px;
+	color: #a9b7c6;
+}
+QProgressBar::chunk {
+	border-radius: 2px;
+	background-color: qlineargradient(spread:pad, x1:0, y1:1, stop:0 #014a32, stop:0.51 #028158 stop:1 #04b97f);
+}
+QMenu{
+	background-color:#0B0D11;
+	border: 1px solid #0A4D68;
+}
+QMenu::item {
+	border-style: solid;
+	border-top-color: transparent;
+	border-right-color: transparent;
+	border-left-color: transparent;
+	border-bottom-color: transparent;
+	border-bottom-width: 1px;
+	color: #a9b7c6;
+	padding-left:2px;
+	padding-top:4px;
+	padding-bottom:4px;
+	padding-right:7px;
+	background-color: #0B0D11;
+}
+QMenu::icon {
+	padding-left: 10px;
+}
+QMenu::item:selected {
+	border-style: solid;
+	border-top-color: transparent;
+	border-right-color: transparent;
+	border-left-color: #0A4D68;
+	border-bottom-color: transparent;
+	border-left-width: 3px;
+	color: #FFFFFF;
+	padding-left:2px;
+	padding-top:4px;
+	padding-bottom:4px;
+	padding-right:7px;
+	background-color: #0B0D11;
+}
+QScrollArea {
+	color: #FFFFFF;
+	background-color: #0B0D11;
+}
+QTableCornerButton::section {
+	background: #0B0D11;
+	border: none;
+}
+QTableView {
+	background: #0B0D11;
+	border: 1px solid #083141;
+	border-radius: 1px;
+	gridline-color: #083141;
+	alternate-background-color: #101824;
+	selection-background-color: #022026;
+	selection-color: #7BB1B0;
+}
+QTableView::item {
+	color: #C1C9CA;
+}
+QTableView QLineEdit:focus {
+	background-color: #0B0D11;
+	color: #C1C9CA;
+	selection-background-color: #213E52;
+}
+QHeaderView {
+	background: #0B0D11;
+}
+QHeaderView::section {
+	color: #a9b7c6;
+	background: #061519;
+}
+QScrollBar {
+	background: #0B0D11;
+	width: 15px;
+	border: none;
+}
+QScrollBar::handle {
+	border: 1px solid #05BFDB;
+	border-radius: 5px;
+	background-color: #0B0D11;
+}
+QScrollBar::add-page, QScrollBar::sub-page, QScrollBar::up-arrow, QScrollBar::down-arrow {
+	background: #0B0D11;
+	border: none;
+}

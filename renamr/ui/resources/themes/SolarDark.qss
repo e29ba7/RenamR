@@ -1,0 +1,118 @@
+/*
+Name: Gunmetal Indigo
+Author: f09f9095
+Link: https://github.com/f09f9095/renamr
+*/
+
+QDialog {
+	background-color:#001315;
+	border: 1px solid #002226;
+	/* border-radius: 4px; */
+}
+QPushButton{
+	color: #a9b7c6;
+	background-color: #001d20;
+	/* border-radius: 3px; */
+	border: 1px solid #00171a;
+	/* border-width: 1px;
+	border-style: solid;
+	border-bottom-color: #00171a;
+	border-top-color: #00171a;
+	border-left-color: #00171a;
+	border-right-color: #00171a; */
+	/* margin-left: 10px;
+	margin-right: 10px; */
+	padding-left: 2ex;
+	padding-right: 2ex;
+}
+QPushButton:hover{
+	color: #FFFFFF;
+	background-color: #0C2C30;
+}
+QProgressBar {
+	border: 1px solid #4c4e52;
+	border-radius: 3px;
+	color: #a9b7c6;
+}
+QProgressBar::chunk {
+	border-radius: 2px;
+	background-color: qlineargradient(spread:pad, x1:0, y1:1, stop:0 #014a32, stop:0.51 #028158 stop:1 #04b97f);
+}
+QMenu{
+	background-color:#001315;
+	border: 1px solid #0A4D68;
+}
+QMenu::item {
+	border-style: solid;
+	border-top-color: transparent;
+	border-right-color: transparent;
+	border-left-color: transparent;
+	border-bottom-color: transparent;
+	border-bottom-width: 1px;
+	color: #a9b7c6;
+	padding-left:17px;
+	padding-top:4px;
+	padding-bottom:4px;
+	padding-right:7px;
+	background-color: #001315;
+}
+QMenu::item:selected {
+	border-style: solid;
+	border-top-color: transparent;
+	border-right-color: transparent;
+	border-left-color: #0A4D68;
+	border-bottom-color: transparent;
+	border-left-width: 3px;
+	color: #FFFFFF;
+	padding-left:14px;
+	padding-top:4px;
+	padding-bottom:4px;
+	padding-right:7px;
+	background-color: #001315;
+}
+QScrollArea {
+	color: #FFFFFF;
+	background-color: #001315;
+}
+QTableCornerButton::section {
+	background: #001315;
+	border: none;
+}
+QTableView {
+	background: #001315;
+	border: 1px solid #0A4D68;
+	border-radius: 1px;
+	gridline-color: #0A4D68;
+	alternate-background-color: #001b1e;
+	selection-background-color: #082d34;
+	selection-color: #05BFDB;
+}
+QTableView::item {
+	color: #C1C9CA;
+}
+QTableView QLineEdit:focus {
+	background-color: #001315;
+	color: #C1C9CA;
+	selection-background-color: #213E52;
+}
+QHeaderView {
+	background: #001315;
+}
+QHeaderView::section {
+	color: #05BFDB;
+	background: #001315;
+}
+QScrollBar {
+	background: #001315;
+	width: 15px;
+	border: none;
+}
+QScrollBar::handle {
+	border: 1px solid #05BFDB;
+	border-radius: 5px;
+	background-color: #001315;
+}
+QScrollBar::add-page, QScrollBar::sub-page, QScrollBar::up-arrow, QScrollBar::down-arrow {
+	background: #001315;
+	border: none;
+}
