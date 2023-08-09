@@ -36,6 +36,22 @@
 3. Make any necessary adjustments to new media titles.
 4. Click Rename!
 
+## Screens
+
+<details>
+  <summary>Main</summary>
+
+  ![Main](https://raw.githubusercontent.com/f09f9095/RenamR/main/renamr/ui/resources/usage.png)
+  
+</details>
+
+<details>
+  <summary>Template</summary>
+  
+  ![Template](https://raw.githubusercontent.com/f09f9095/RenamR/main/renamr/ui/resources/template.png)
+
+</details>
+
 ## Running from source
 
 1. Ensure at least [Python](https://www.python.org/downloads/) 3.8 is installed (also make sure Python is added to PATH).
@@ -52,22 +68,6 @@
 3. In the cloned RenamR folder, run `python -m nuitka --follow-imports --disable-console --standalone --onefile --include-data-files="renamr/ui/resources/icons/*.*"="renamr/ui/resources/icons/" --include-data-files="renamr/ui/resources/themes/*.qss"="renamr/ui/resources/themes/" --plugin-enable=pyqt6 --windows-icon-from-ico="renamr/ui/resources/icons/VHS.ico" main.py`
 4. Follow instructions in terminal to install necessary dependencies
 5. Results in main.exe
-
-## Screens
-
-<details>
-  <summary>Main</summary>
-
-  ![Main](https://raw.githubusercontent.com/f09f9095/RenamR/main/renamr/ui/resources/usage.png)
-  
-</details>
-
-<details>
-  <summary>Template</summary>
-  
-  ![Template](https://raw.githubusercontent.com/f09f9095/RenamR/main/renamr/ui/resources/template.png)
-
-</details>
 
 ## Contributions
 
