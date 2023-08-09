@@ -359,4 +359,4 @@ class Table(QTableWidget):
         '''
 
         self.removeRow(row)
-        self.check_for_errors()
+        # self.check_for_errors()
