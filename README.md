@@ -45,6 +45,14 @@
 5. Run `pip install -r requirements.txt` to install necessary dependencies
 6. Finally run `python main.py`.
 
+## Building from source for Windows
+
+1. Follow steps 1 - 5 above
+2. Install [Nuitka](https://nuitka.net/doc/download.html) with `pip install Nuitka`
+3. In the cloned RenamR folder, run `python -m nuitka --follow-imports --disable-console --standalone --onefile --include-data-files="renamr/ui/resources/icons/*.*"="renamr/ui/resources/icons/" --include-data-files="renamr/ui/resources/themes/*.qss"="renamr/ui/resources/themes/" --plugin-enable=pyqt6 --windows-icon-from-ico="renamr/ui/resources/icons/VHS.ico" main.py`
+4. Follow instructions in terminal to install necessary dependencies
+5. Results in main.exe
+
 ## Screens
 
 <details>
