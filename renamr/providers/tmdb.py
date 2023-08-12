@@ -1,4 +1,5 @@
 from renamr.providers.provider import Provider
+from renamr.utils.cache import Cache
 from renamr.utils.utils import timer
 
 
@@ -207,6 +208,7 @@ class TheMovieDB(Provider):
         return episodes
 
     @classmethod
+    @Cache
     def movie(
         cls,
         query: str,
@@ -245,6 +247,7 @@ class TheMovieDB(Provider):
             return cls.get_movie_info(movie_id=search_results[0].get('id'))
 
     @classmethod
+    @Cache
     def tv(
         cls,
         query: str,
@@ -291,7 +294,6 @@ class TheMovieDB(Provider):
             # Append episode information to $series_info
             seasons_info: dict = dict()
             episodes_info: dict = dict()
-            seasons = set(a.__str__() for a in seasons)
             for season_num in seasons:
                 seasons_info[season_num]: dict = cls.get_season_info(
                     season_info=series_info['seasons'][season_num]
@@ -301,5 +303,9 @@ class TheMovieDB(Provider):
                     season=season_num
                 )
 
-            return (series_info, seasons_info, episodes_info)
-        return (None, None, None)
+            return {
+                **series_info,
+                'season_info': seasons_info,
+                'episode_info': episodes_info
+            }
+        return dict()

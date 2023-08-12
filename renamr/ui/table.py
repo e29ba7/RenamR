@@ -206,10 +206,10 @@ class Table(QTableWidget):
     @timer
     def movie_lookup(self, provider: Callable) -> None:
         '''
-        Iterate through column `Current Name` searching each item with $provider
-        for Metadata.
-        Sets each 'New Name' column cell with first result from
-        provider search results.
+        Iterate through column `Current Name` searching each item
+        with $provider for Metadata.
+        Sets each 'New Name' column cell with data from provider's
+        first search result.
 
         Args:
             provider (Callable): Which provider to probe for information.
@@ -219,7 +219,7 @@ class Table(QTableWidget):
             self._item = self.item(file, 0).data
             # Get movie info from $provider
             self.movie_info: dict = provider(
-                query=self._item.get('title'),
+                query=self._item.get('title').lower(),  # .lower() for proper caching
                 year=self._item.get('year')
             )
             if self.movie_info:
@@ -270,11 +270,10 @@ class Table(QTableWidget):
                 self.series_title = item.get('title')
             # Retrieve necessary seasons to search
             if item['season_num']:
-                self.seasons.add(int(item['season_num']))
+                self.seasons.add(item['season_num'])
         if not self.seasons:
             return None
-        # $provider.tv returns tup(series_info, season_info, episode_info)
-        self.series_info, self.seasons_info, self.episodes_info = provider(
+        self.series_info: dict = provider(  # Get series data from provider
             query=self.series_title,
             seasons=self.seasons,
             year=self.item(file, 0).data.get('year', None)
@@ -282,20 +281,20 @@ class Table(QTableWidget):
         # If None returned from provider search
         if not self.series_info:
             # TODO
-            pass
             # UnknownMediaWindow(
             #     file=item['filename'],
             #     title='What show is this?',
             #     icon=Dir.get_file('icon', 'VHS.png')
             # )
+            ...
         for file in range(self.rowCount()):
             self.season: str = self.item(file, 0).data.get('season_num', '')
             self.episode: str = self.item(file, 0).data.get('episode_num', '')
             self.data: dict = {
                 # Combine Series, Season, and Episode dicts together
-                **self.series_info,                                 # Series info
-                **self.seasons_info[self.season],                   # Season info
-                **self.episodes_info[self.season][self.episode]     # Episode info
+                **self.series_info,
+                **self.series_info['season_info'][self.season],
+                **self.series_info['episode_info'][self.season][self.episode]
             }
             # Set New Name column cell to new filename
             self.setItem(
