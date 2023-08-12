@@ -2,8 +2,10 @@
 .vscode/
 main.build/
 main.dist/
-main.cmd
-main.exe
+main.onefile-build/
+*.cmd
+*.exe
+cache.json
 Test files
 launch.json
 
