@@ -21,9 +21,9 @@
 
 ## To-Do
 
-- [ ] Drag and drop files into application
+- [x] Drag and drop files into application
 - [ ] Multithreading
-- [ ] Table context menu
+- [x] Table context menu
 - [ ] Support other media databases
 - [ ] Renaming history and undoing
 - [ ] Remux video files to your favorite container
@@ -39,16 +39,10 @@
 ## Screens
 
 <details>
-  <summary>Main</summary>
 
-  ![Main](https://raw.githubusercontent.com/f09f9095/RenamR/main/renamr/ui/resources/usage.png)
-  
-</details>
+  https://raw.githubusercontent.com/f09f9095/RenamR/main/renamr/ui/resources/usage.png
 
-<details>
-  <summary>Template</summary>
-  
-  ![Template](https://raw.githubusercontent.com/f09f9095/RenamR/main/renamr/ui/resources/template.png)
+  https://raw.githubusercontent.com/f09f9095/RenamR/main/renamr/ui/resources/template.png
 
 </details>
 
