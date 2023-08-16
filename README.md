@@ -38,13 +38,9 @@
 
 ## Screens
 
-<details>
+![Main](https://raw.githubusercontent.com/f09f9095/RenamR/main/renamr/ui/resources/usage.png)
 
-  https://raw.githubusercontent.com/f09f9095/RenamR/main/renamr/ui/resources/usage.png
-
-  https://raw.githubusercontent.com/f09f9095/RenamR/main/renamr/ui/resources/template.png
-
-</details>
+![Template](https://raw.githubusercontent.com/f09f9095/RenamR/main/renamr/ui/resources/template.png)
 
 ## Running from source
 
