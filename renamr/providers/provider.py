@@ -17,7 +17,7 @@ class Provider:
     '''
 
     @classmethod
-    def request(cls, url: str, header: dict) -> Response:
+    def request(cls, url: str, header: dict = dict()) -> Response:
         '''
         Send get request to url, return response
 
@@ -29,6 +29,8 @@ class Provider:
             Response: Get response from provided url
         '''
 
+        if not header:  # Use default header if none passed in
+            header = HEAD
         try:
             req = get(
                 url=url,
@@ -42,7 +44,7 @@ class Provider:
         return req
 
     @classmethod
-    def request_json(cls, url: str, header: dict) -> dict:
+    def request_json(cls, url: str, header: dict | None = None) -> dict:
         '''
         Get url and header, return json object
 

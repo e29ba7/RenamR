@@ -65,12 +65,12 @@ def timer(func: Callable) -> Callable:
         Result of decorated function
     '''
 
-    def inner(self, *args, **kwargs):
+    def decor_timer(self, *args, **kwargs):
         start = time.time()
         res = func(self, *args, **kwargs)
         print(f'{func.__name__} took {time.time() - start:.2f}s')
         return res
-    return inner
+    return decor_timer
 
 
 def open_file_dialog() -> list[Path]:
@@ -308,7 +308,7 @@ translator: dict = {
     r'%ml': 'movie_language',
     r'%mrun': 'runtime',
     r'%b': 'budget',
-    r'%p': 'profit',
+    r'%mrev': 'revenue',
     r'%col': 'collection',
     # Series specific
     r'%lay': 'last_air_year',

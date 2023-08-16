@@ -7,6 +7,7 @@ from PyQt6.QtGui import QColor, QIcon
 from PyQt6.QtWidgets import (
     QAbstractItemView,
     QHeaderView,
+    QMenu,
     QTableWidget,
     QTableWidgetItem,
 )
@@ -36,7 +37,6 @@ class Table(QTableWidget):
         self.setCornerButtonEnabled(False)
         self.setEditTriggers(QAbstractItemView.EditTrigger.DoubleClicked)
         self.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
-        self.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
         self.setSortingEnabled(True)
         self.setWordWrap(False)
         self.verticalHeader().setVisible(False)
@@ -59,6 +59,47 @@ class Table(QTableWidget):
         self.verticalHeader().setSectionResizeMode(
             QHeaderView.ResizeMode.Fixed
         )
+        # Context Menu
+        self.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        self.customContextMenuRequested.connect(self.context_menu)
+
+    def context_menu(self, pos):
+        '''
+        Popup menu when right click on item in table view.
+        This function get's the mouse right clicked position and item.
+        Then displays a small menu with options to interact with the item.
+
+        Args:
+            pos: Mouse right click position.
+        '''
+
+        self.context_menu_options = QMenu(self)
+        self.context_item = self.itemAt(pos)    # Get item that was right clicked
+        self.context_items = [                  # Get selected items in table view
+            index
+            for index in self.selectedIndexes() # Get selected items indexes
+            if index.data()                     # Only if it contains text
+        ]
+        if self.context_item:
+            # self.context_menu_options.addAction(
+            #     QIcon(Dir.get_file('icon', 'contextSearch.png')),
+            #     'Search',
+            #     lambda: self.search_for_item(
+            #         search_item=self.item(self.context_item.row(), 0)
+            #                     .data.get('title', '')
+            #     )
+            # )
+            self.context_menu_options.addAction(
+                QIcon(Dir.get_file('icon', 'contextEdit.png')),
+                'Edit',
+                lambda: self.editItem(self.item(self.context_item.row(), 1))
+            )
+            self.context_menu_options.addAction(
+                QIcon(Dir.get_file('icon', 'contextRemove.png')),
+                'Remove',
+                lambda: self.clear_element(self.context_items)
+            )
+            self.context_menu_options.exec(self.mapToGlobal(pos))
 
     def flag_as_busy(func) -> Callable:
         '''
@@ -69,12 +110,12 @@ class Table(QTableWidget):
             func (Callable): Function to be run. While running, $app_busy will be True
         '''
 
-        def inner(self, *args, **kwargs):
+        def decor_busy(self, *args, **kwargs):
             if not self.app_busy:
                 self.app_busy = True
                 func(self, *args, **kwargs)
                 self.app_busy = False
-        return inner
+        return decor_busy
 
     def toggle_error_check(func: Callable) -> Callable:
         '''
@@ -88,10 +129,10 @@ class Table(QTableWidget):
             Callable: Passed in function, blocking signals during running.
         '''
 
-        def inner(self, *args, **kwargs):
+        def decor_error_check(self, *args, **kwargs):
             with QSignalBlocker(self):
                 return func(self, *args, **kwargs)
-        return inner
+        return decor_error_check
 
     @toggle_error_check
     @timer
@@ -106,7 +147,7 @@ class Table(QTableWidget):
         '''
 
         self.row_count = self.rowCount()
-        self._item = 0
+        self.item_count = 0
         # Get list of items currently loaded in table
         self.current_items: list[str] = [
             self.item(file, 0).data['absolute_path'].__str__()
@@ -125,15 +166,15 @@ class Table(QTableWidget):
             self.setItem(
                 row,
                 0,
-                Metadata(item=files[self._item])
+                Metadata(item=files[self.item_count])
             )
             self.setItem(row, 1, QTableWidgetItem(''))  # Allows edit when cell empty
             # self.setItem(row, 2, QTableWidgetItem(''))
-            self._item += 1
+            self.item_count += 1
         self.resizeRowsToContents()
 
     @toggle_error_check
-    @timer
+    # @timer
     def check_for_errors(self, _row: int = None, _column: int = None) -> None:
         '''
         Check table view for duplicate names in New Name column.
@@ -149,25 +190,25 @@ class Table(QTableWidget):
         # Iterate through files looking for duplicates in `New Name` column,
         for row in range(self.rowCount()):
             try:
-                self._item = self.item(row, 1).text()
+                self.check_item = self.item(row, 1).text()
                 # Assign item text to $_item and check if in $self.seen
-                if self._item in self.seen:
-                    self.seen[self._item] = True
+                if self.check_item in self.seen:
+                    self.seen[self.check_item] = True
                     continue
-                if self._item:  # Prevents empty cells from being labeled as dupes.
-                    self.seen[self._item] = False
+                if self.check_item:  # Prevents empty cells being labeled as dupes.
+                    self.seen[self.check_item] = False
             except AttributeError:
                 # $_item doesn't have a title, passing
                 continue
         # Iterate through files applying errors and tinting errored rows red
         for row in range(self.rowCount()):
             try:
-                self._item = self.item(row, 1).text()
-                if self.seen.get(self._item):
+                self.check_item = self.item(row, 1).text()
+                if self.seen.get(self.check_item):
                     self.set_row_color(row, error = 'Dupe')
                 elif re.search(  # Check for invalid characters
-                    r'[<>:"/\\\|?*]|[ .]+$',
-                    self._item
+                    r'[<>:"/\\\|?*]',  # Chars in brackets to be labeled invalid
+                    self.check_item
                 ):
                     self.set_row_color(row, error = 'Invalid')
                 else:
@@ -203,7 +244,7 @@ class Table(QTableWidget):
 
     @toggle_error_check
     @flag_as_busy
-    @timer
+    # @timer
     def movie_lookup(self, provider: Callable) -> None:
         '''
         Iterate through column `Current Name` searching each item
@@ -216,16 +257,16 @@ class Table(QTableWidget):
         '''
 
         for file in range(self.rowCount()):
-            self._item = self.item(file, 0).data
+            self.movie_item = self.item(file, 0).data
             # Get movie info from $provider
             self.movie_info: dict = provider(
-                query=self._item.get('title').lower(),  # .lower() for proper caching
-                year=self._item.get('year')
+                query=self.movie_item.get('title').lower(),  # .lower for proper caching
+                year=self.movie_item.get('year')
             )
             if self.movie_info:
                 # Add resolution info to item info dict
                 self.movie_info.update({
-                    'resolution': self._item.get('resolution', '')
+                    'resolution': self.movie_item.get('resolution', '')
                 })
                 # Set title in New Name column
                 self.setItem(
@@ -234,19 +275,19 @@ class Table(QTableWidget):
                     Metadata(item=self.movie_info)
                 )
             else:
-                continue
                 # Show dialog asking for movie name
                 # TODO: Get name and re-search with $provider
                 # UnknownMediaWindow(
-                #     file=self._item.get('filename'),
+                #     file=self.movie_item.get('filename'),
                 #     title='What movie is this?',
                 #     icon=Dir.get_file('icon', 'VHS.png')
                 # )
+                ...
         self.check_for_errors()
 
     @toggle_error_check
     @flag_as_busy
-    @timer
+    # @timer
     def tv_lookup(self, provider: Callable) -> None:
         '''
         Loop through files in table view looking for title of series,
@@ -290,12 +331,16 @@ class Table(QTableWidget):
         for file in range(self.rowCount()):
             self.season: str = self.item(file, 0).data.get('season_num', '')
             self.episode: str = self.item(file, 0).data.get('episode_num', '')
-            self.data: dict = {
-                # Combine Series, Season, and Episode dicts together
-                **self.series_info,
-                **self.series_info['season_info'][self.season],
-                **self.series_info['episode_info'][self.season][self.episode]
-            }
+            try:
+                self.data: dict = {
+                    # Combine Series, Season, and Episode dicts together
+                    **self.series_info,
+                    **self.series_info['season_info'][self.season],
+                    **self.series_info['episode_info'][self.season][self.episode]
+                }
+            except KeyError:
+                # Sometimes an episode or season is missing from the provider's DB
+                continue
             # Set New Name column cell to new filename
             self.setItem(
                 file,
@@ -349,13 +394,17 @@ class Table(QTableWidget):
         self.clearContents()
         self.setRowCount(0)
 
-    def clear_element(self, row: int) -> None:
+    def clear_element(self, row: int | list) -> None:
         '''
-        Remove a single row from the table view.
+        Remove a single row or a list of rows from the table view.
 
         Args:
-            row (int): Row to be removed.
+            row (int | list): Row(s) to be removed.
         '''
 
-        self.removeRow(row)
-        # self.check_for_errors()
+        if isinstance(row, int):                    # Check if row is integer
+            self.removeRow(row)
+        if isinstance(row, list):                   # Check if row is a list
+            for item in sorted(row, reverse=True):  # Loop through table bottom up
+                self.removeRow(item.row())          # Remove row and items
+        self.check_for_errors()                     # Check the table for errors
