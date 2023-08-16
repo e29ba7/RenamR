@@ -8,6 +8,7 @@ from PyQt6.QtGui import (
 from PyQt6.QtWidgets import QMenu
 
 from renamr.providers.tmdb import TheMovieDB
+from renamr.providers.omdb import OMDb
 from renamr.utils.settings import Settings
 from renamr.utils.utils import Dir, open_file_dialog
 from renamr.ui.baseDialogWindow import DialogWindow
@@ -25,6 +26,12 @@ class Main(DialogWindow):
     Methods:
         __init__(self) -> None:
             Initializes main window by setting up UI components and connecting signals.
+
+        dragEnterEvent(self, event):
+            Handles the event when dragging items over the main window.
+
+        dropEvent(self, event):
+            Handles the event when dropping items onto the main window.
 
         open_files(self):
             Opens a file dialog to select files and adds files to the table.
@@ -45,12 +52,12 @@ class Main(DialogWindow):
         # Load settings on application start
         self.settings = Settings()
 
+        # Flags
+        self.setAcceptDrops(True)
+
         # Layout
-        # self.setLayout(self.layout)
         self.layout.setSpacing(0)
         self.layout.setContentsMargins(10, 10, 10, 0)
-        # self.layout.setRowMinimumHeight(3, 6)
-        # self.layout.setRowStretch(15, 0)
 
         # Table Widget
         self.table = Table()
@@ -70,12 +77,12 @@ class Main(DialogWindow):
         # Options Menu Button and Items
         self.options_menu = QMenu('Options Menu')
         self.movie_template_action = QAction(
-            icon=QIcon(Dir.get_file('icon', 'make_icon.png')),
+            icon=QIcon(Dir.get_file('icon', 'movieButton.png')),
             text='Edit Movie Output Template',
             parent=self
         )
         self.tv_template_action = QAction(
-            icon=QIcon(Dir.get_file('icon', 'make_icon.png')),
+            icon=QIcon(Dir.get_file('icon', 'tvButton.png')),
             text='Edit TV Output Template',
             parent=self
         )
@@ -104,19 +111,37 @@ class Main(DialogWindow):
             text='TheMovieDB (Movie)',
             parent=self
         )
+        self.omdb_movie_action = QAction(
+            icon=QIcon(Dir.get_file('icon', 'omdb.png')),
+            text='OMDb (Movie)',
+            parent=self
+        )
         self.tmdb_tv_action = QAction(
             icon=QIcon(Dir.get_file('icon', 'tmdb.svg')),
             text='TheMovieDB (TV)',
             parent=self
         )
+        self.omdb_tv_action = QAction(
+            icon=QIcon(Dir.get_file('icon', 'omdb.png')),
+            text='OMDb (TV)',
+            parent=self
+        )
         self.search_menu.addAction(self.tmdb_movie_action)
+        self.search_menu.addAction(self.omdb_movie_action)
         self.search_menu.addSection(QIcon(Dir.get_file('icon', 'xButton.png')), 'TV:')
         self.search_menu.addAction(self.tmdb_tv_action)
+        self.search_menu.addAction(self.omdb_tv_action)
         self.tmdb_movie_action.triggered.connect(
             lambda: self.table.movie_lookup(TheMovieDB.movie)
         )
+        self.omdb_movie_action.triggered.connect(
+            lambda: self.table.movie_lookup(OMDb.movie)
+        )
         self.tmdb_tv_action.triggered.connect(
             lambda: self.table.tv_lookup(TheMovieDB.tv)
+        )
+        self.omdb_tv_action.triggered.connect(
+            lambda: self.table.tv_lookup(OMDb.tv)
         )
         self.search_menu_button = Button(text='Search', icon='searchButton.png')
         self.search_menu_button.setMenu(self.search_menu)
@@ -129,6 +154,37 @@ class Main(DialogWindow):
 
         # Show window
         self.show()
+
+    def dragEnterEvent(self, event):
+        '''
+        Handles the event when dragging items over the main window.
+
+        Args:
+            event: Dropped files event.
+        '''
+
+        if event.mimeData().hasUrls():
+            event.acceptProposedAction()
+
+    def dropEvent(self, event):
+        '''
+        Handle dropped files and folders onto window.
+        Sends list[Path] to generate_rows_and_names for files to be added to table.
+
+        Args:
+            event: Dropped files event. Files are pulled from this.
+        '''
+
+        self.to_load: list = list()
+        for url in event.mimeData().urls():                 # Iterate over dropped items
+            self.file_path = Path(url.toLocalFile())        # Get Path objects of items
+            if self.file_path.is_dir():                     # If dropped item is folder
+                for file in self.file_path.rglob(r'*'):     # Get all files in folder
+                    if file.is_file():                      # If dropped item is file
+                        self.to_load.append(file)           # Add file to $self.to_load
+            else:
+                self.to_load.append(self.file_path)         # Add file to $self.to_load
+        self.table.populate_table(files=self.to_load)
 
     def open_files(self):
         '''
