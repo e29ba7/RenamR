@@ -24,6 +24,7 @@ class TheMovieDB(Provider):
         '''
         Get search results from The Movie Database (TMDB)
         based on the provided query and search type.
+        Year will be appended to url if one is provided.
 
         Args:
             query (str): The search query to look for in TMDB.
@@ -53,6 +54,16 @@ class TheMovieDB(Provider):
 
     @classmethod
     def get_movie_info(cls, movie_id: str) -> dict:
+        '''
+        Get movie info from The Movie Database (TMDB)
+        based on the provided Movie ID.
+
+        Args: movie_id (str): ID of movie on TMDB.
+
+        Returns:
+            dict: A dictionary containing movie info from TMDB.
+        '''
+
         result = cls.request_json(
             url=f'https://api.themoviedb.org/3/movie/{movie_id}',
             header=cls.TMDB_HEADER
@@ -83,7 +94,7 @@ class TheMovieDB(Provider):
             'overview': result.get('overview', ''),
             'runtime': result.get('runtime', '').__str__(),
             'budget': result.get('budget', '').__str__(),
-            'profit': result.get('revenue', '').__str__(),
+            'revenue': result.get('revenue', '').__str__(),
             'collection': result.get('belongs_to_collection', '')
         }
         return movie_info
@@ -93,38 +104,48 @@ class TheMovieDB(Provider):
         cls,
         series_id: str
     ) -> dict:
-        results = cls.request_json(
+        '''
+        Get Series info from The Movie Database (TMDB)
+        based on the provided Series ID.
+
+        Args: Series_id (str): ID of Series on TMDB.
+
+        Returns:
+            dict: A dictionary containing Series info from TMDB.
+        '''
+
+        series_results = cls.request_json(
             url=f'https://api.themoviedb.org/3/tv/{series_id}',
             header=cls.TMDB_HEADER
         )
         series_info: dict[str] = {
-            'title': results.get('name', ''),
-            'original_title': results.get('original_name', ''),
-            'id': results.get('id', '').__str__(),
-            'year': results.get('first_air_date', '').split('-')[0],
-            'month': results.get('first_air_date', '').split('-')[1],
-            'day': results.get('first_air_date', '').split('-')[2],
-            'date': results.get('first_air_date', ''),
-            'genre': results.get('genres', '')[0]['name'],
-            'last_air_year': results.get('last_air_date', '').split('-')[0],
-            'last_air_month': results.get('last_air_date', '').split('-')[1],
-            'last_air_day': results.get('last_air_date', '').split('-')[2],
-            'last_air_date': results.get('last_air_date', ''),
-            'language': results.get('languages', '')[0],
-            'network': results.get('networks', '')[0]['name'],
-            'origin_country': results.get('origin_country', '')[0],
-            'original_language': results.get('original_language', ''),
-            'rating_votes': results.get('vote_count', '').__str__(),
-            'rating': results.get('vote_average', '').__str__(),
+            'title': series_results.get('name', ''),
+            'original_title': series_results.get('original_name', ''),
+            'id': series_results.get('id', '').__str__(),
+            'year': series_results.get('first_air_date', '').split('-')[0],
+            'month': series_results.get('first_air_date', '').split('-')[1],
+            'day': series_results.get('first_air_date', '').split('-')[2],
+            'date': series_results.get('first_air_date', ''),
+            'genre': series_results.get('genres', '')[0]['name'],
+            'last_air_year': series_results.get('last_air_date', '').split('-')[0],
+            'last_air_month': series_results.get('last_air_date', '').split('-')[1],
+            'last_air_day': series_results.get('last_air_date', '').split('-')[2],
+            'last_air_date': series_results.get('last_air_date', ''),
+            'language': series_results.get('languages', '')[0],
+            'network': series_results.get('networks', '')[0]['name'],
+            'origin_country': series_results.get('origin_country', '')[0],
+            'original_language': series_results.get('original_language', ''),
+            'rating_votes': series_results.get('vote_count', '').__str__(),
+            'rating': series_results.get('vote_average', '').__str__(),
             'seasons': {
                 v.get('season_number').__str__(): v
-                for v in results.get('seasons')
+                for v in series_results.get('seasons')
             },
-            'status': results.get('status', ''),
-            'tagline': results.get('tagline', ''),
-            'type': results.get('type', ''),
-            'total_episodes': results.get('number_of_episodes', '').__str__(),
-            'total_seasons': results.get('number_of_seasons', '').__str__(),
+            'status': series_results.get('status', ''),
+            'tagline': series_results.get('tagline', ''),
+            'type': series_results.get('type', ''),
+            'total_episodes': series_results.get('number_of_episodes', '').__str__(),
+            'total_seasons': series_results.get('number_of_seasons', '').__str__(),
         }
 
         return series_info
@@ -134,6 +155,16 @@ class TheMovieDB(Provider):
         cls,
         season_info: dict
     ) -> dict:
+        '''
+        Get Season info from The Movie Database (TMDB)
+        based on the provided Season ID.
+
+        Args: season_info (dict): Dictionary of season info from TMDB.
+
+        Returns:
+            dict: A dictionary containing Season info from TMDB reorganized.
+        '''
+
         return {
             'season_num': season_info.get('season_number', '').__str__(),
             'season_num_pad': season_info.get('season_number', '').__str__().zfill(2),
@@ -154,28 +185,15 @@ class TheMovieDB(Provider):
         season: str
     ) -> dict:
         '''
-        Get episode info for provided season.
+        Get Episode info from The Movie Database (TMDB)
+        based on the provided Season ID.
 
         Args:
-            series_id (str): Series identifier
-            season (int): Season to gather episodes for
+            series_id (str): ID for Series on TMDB.
+            season (str): Season to get episode info for.
 
         Returns:
-            episodes (dict): Dictionary of dictionaries containing info for each episode
-            example {
-                '1': {
-                    'episode_title': 'The First Show Ever',
-                    'episode_id': '1',
-                    'episode_runtime': '5',
-                    ...
-                },
-                '2': {
-                    'episode_title': 'The Show Show',
-                    'episode_id': '15542',
-                    'episode_runtime': '28',
-                    ...
-                }
-            }
+            dict: A dictionary containing Episode info from TMDB reorganized.
         '''
 
         # Get list of episodes from TMDB
@@ -221,20 +239,7 @@ class TheMovieDB(Provider):
             query (str): Title of movie to be searched
 
         Returns:
-            dict | None:
-            {1: {
-                title: 'Sintel',
-                id: '45745',
-                year: '2010',
-                etc.
-            },
-            {2: {
-                title: 'Elephants Dream',
-                id: '9761',
-                year: '2006',
-                etc.
-                }
-            }
+            dict | None: Dictionary containing Movie information from TMDB.
         '''
 
         search_results: list = cls.get_results(
@@ -255,29 +260,16 @@ class TheMovieDB(Provider):
         year: str | None = None
     ) -> dict | None:
         '''
-        Loops through items in Current Name column looking for proper name to search.
-        Once found, search and get $series_info (dict) from results and break loop.
-        Loop Current Name again and set New Names.
+        Loop through items in `Current Name` column looking for proper name to search.
+        If found, get $series_info (dict), $season_info (dict), and $episode_info (dict)
+        from results and break loop.
+        Loop `Current Name` again and set new names in `New Name` column.
 
         Args:
-            query (str): Extracted title of file to be searched
+            query (str): Title of Series to be searched.
 
         Returns:
-            series_info: {
-                title: 'Example',
-                id: '123',
-                year: '1999',
-                seasons: 2,
-                1: {
-                    1: 'Episode Title',
-                    2: 'Other Episode Title',
-                    3: 'Another Title'
-                },
-                2: {
-                    1: 'First Episode Title',
-                    2: 'Final Episode Title'
-                },
-            }
+            dict | None: Dictionary containing Movie information from TMDB.
         '''
 
         # Get search results for series
